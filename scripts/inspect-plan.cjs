@@ -1,0 +1,1 @@
+const sharp=require('sharp'),fs=require('fs');(async()=>{const {data,info}=await sharp('blender-output/user-plan-fixture.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});fs.writeFileSync('blender-output/user-plan.rgba',data);fs.writeFileSync('blender-output/user-plan-size.json',JSON.stringify(info));console.log(info);})();

@@ -1,0 +1,8 @@
+Photographic textures and environment, CC0, Poly Haven:
+https://polyhaven.com/a/oak_veneer_05
+https://polyhaven.com/a/rough_linen
+https://polyhaven.com/a/epping_forest_01
+Textures adapted and baked for this apartment walkthrough.
+
+Outdoor grass: https://polyhaven.com/a/grass_ground (CC0)
+Outdoor paving: https://polyhaven.com/a/concrete_pavement (CC0)

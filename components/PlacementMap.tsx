@@ -1,0 +1,23 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import type * as Leaflet from 'leaflet';
+import {houseCorners,type HousePlacement} from '@/lib/house-placement';
+export function PlacementMap({value,onChange,readOnly=false}:{value:HousePlacement|null;onChange:(p:HousePlacement)=>void;readOnly?:boolean}){
+ const host=useRef<HTMLDivElement>(null),map=useRef<Leaflet.Map|null>(null),lib=useRef<typeof Leaflet|null>(null),shape=useRef<Leaflet.Polygon|null>(null),marker=useRef<Leaflet.Marker|null>(null),latest=useRef(value),callback=useRef(onChange);
+ const[ready,setReady]=useState(false),[query,setQuery]=useState(''),[results,setResults]=useState<{lat:number;lng:number;label:string}[]>([]),[error,setError]=useState(''),[searching,setSearching]=useState(false);
+ useEffect(()=>{latest.current=value;callback.current=onChange;},[value,onChange]);
+ useEffect(()=>{let disposed=false;void(async()=>{try{const L=await import('leaflet');const response=await fetch('/api/intake/map-config');if(!response.ok)throw new Error('Mapu se nepodařilo načíst.');const config=await response.json();if(disposed||!host.current)return;lib.current=L;const m=L.map(host.current,{scrollWheelZoom:true}).setView(value?[value.lat,value.lng]:[49.8,15.5],value?18:7);map.current=m;
+ const tiles=L.tileLayer(config.tileUrl,{maxZoom:19,attribution:config.attribution}).addTo(m);tiles.on('tileerror',()=>setError('Mapový podklad není dostupný. Zkontrolujte připojení k internetu.'));tiles.on('tileload',()=>setError(''));L.control.scale({imperial:false}).addTo(m);
+ if(!readOnly)m.on('click',(e:Leaflet.LeafletMouseEvent)=>{callback.current({...latest.current||{width:10,length:10,rotation:0},lat:e.latlng.lat,lng:e.latlng.lng});});
+ const resize=new ResizeObserver(()=>m.invalidateSize());resize.observe(host.current);m.on('unload',()=>resize.disconnect());setReady(true);
+ }catch{if(!disposed)setError('Mapu se nepodařilo načíst. Zkuste stránku obnovit.');}})();return()=>{disposed=true;map.current?.remove();map.current=null;};
+ // The map instance is created once; changes are applied through refs below.
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[]);
+ useEffect(()=>{if(!ready||!map.current||!lib.current)return;const L=lib.current,m=map.current;if(!value){shape.current?.remove();shape.current=null;marker.current?.remove();marker.current=null;return;}
+ if(!shape.current)shape.current=L.polygon(houseCorners(value),{color:'#149f88',weight:3,fillColor:'#4fd1b8',fillOpacity:.45,interactive:false}).addTo(m);else shape.current.setLatLngs(houseCorners(value));
+ if(!marker.current){marker.current=L.marker([value.lat,value.lng],{draggable:!readOnly,title:readOnly?'Střed domu':'Přetáhněte střed domu',icon:L.divIcon({html:'<span aria-hidden="true">✥</span>',className:'intake-house-handle',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(m);marker.current.on('drag',()=>{const q=marker.current!.getLatLng();callback.current({...latest.current!,lat:q.lat,lng:q.lng});});}else marker.current.setLatLng([value.lat,value.lng]);
+ },[value,ready,readOnly]);
+ const search=async(e:React.FormEvent)=>{e.preventDefault();setSearching(true);setError('');setResults([]);try{const r=await fetch('/api/intake/search?q='+encodeURIComponent(query));const data=await r.json();if(!r.ok)throw new Error(data.error);setResults(data.results);if(!data.results.length)setError('Místo nenalezeno. Zkuste obec a ulici, nebo najděte místo přímo na mapě.');}catch(e){setError((e as Error).message);}finally{setSearching(false);}};
+ return<div className="intake-map-wrap">{!readOnly&&<div className="intake-map-search"><form onSubmit={search}><input aria-label="Hledat místo na mapě" placeholder="Obec, ulice nebo adresa" value={query} onChange={e=>setQuery(e.target.value)} minLength={3} maxLength={160} required/><button disabled={searching}>{searching?'Hledám…':'Najít místo'}</button></form>{!!results.length&&<div className="intake-search-results">{results.map((r,i)=><button key={i} onClick={()=>{map.current?.setView([r.lat,r.lng],18);setQuery(r.label);setResults([]);}}>{r.label}</button>)}</div>}<small>Vyhledávání: Photon / OpenStreetMap. Odesílá se pouze hledaný text.</small></div>}<div ref={host} className="intake-map" aria-label="Mapa umístění domu"/>{error&&<p role="alert" className="intake-map-error">{error}</p>}{!readOnly&&<button className="intake-place-center" disabled={!ready} onClick={()=>{const m=map.current!;const q=m.getCenter();callback.current({...latest.current||{width:10,length:10,rotation:0},lat:q.lat,lng:q.lng});if(m.getZoom()<17)m.setZoom(18);}}>Umístit dům doprostřed mapy</button>}</div>;
+}

@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {canStand,canTravel,nearestStanding} from '../lib/quest-navigation.ts';
+const g={step:1,nx:5,nz:3,ox:0,oz:0,cells:[1,1,0,1,1,1,1,0,1,1,1,1,0,1,1]};
+assert.equal(canStand(g,-.1,1),false);
+assert.equal(canStand(g,5,1),false);
+assert.equal(canStand(g,2.5,1.5),false);
+assert.equal(canTravel(g,.5,.5,4.5,.5),false,'No tunnelling through wall');
+assert.equal(canTravel(g,.5,.5,1.5,2.5),true);
+assert.deepEqual(nearestStanding(g,2.6,1.4),[3.5,1.5]);
+assert.throws(()=>nearestStanding({...g,cells:g.cells.map(()=>0)},0,0));
+console.log('Navigation: boundaries, walls, sliding segment and spawn checks passed.');

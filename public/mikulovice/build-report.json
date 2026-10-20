@@ -1,0 +1,12 @@
+{
+  "meshes": 24,
+  "triangles": 598198,
+  "atlases": 23,
+  "navigableCells": 22913,
+  "bakedLighting": true,
+  "bytes": 85701064,
+  "materials": 24,
+  "primitives": 24,
+  "unlitMaterials": 23,
+  "textureImages": 23
+}

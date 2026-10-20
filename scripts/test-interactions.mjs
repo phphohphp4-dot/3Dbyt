@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import {panelBlocks} from '../lib/quest-interactions.ts';
+const closed={x:2,z:3,width:.82,angle:0};
+assert.equal(panelBlocks(closed,2.4,3.1),true,'Closed leaf blocks the opening');
+assert.equal(panelBlocks(closed,2.4,3.5),false);
+const open={...closed,angle:Math.PI/2};
+assert.equal(panelBlocks(open,2.4,3.1),false,'Opening clears the center of the doorway');
+assert.equal(panelBlocks(open,2.1,2.6),true,'Open leaf still has collision');
+assert.equal(panelBlocks(closed,1.9,3),true,'Hinge end has a safety radius');
+assert.equal(panelBlocks(closed,3.3,3),false);
+console.log('Door collision tests passed for closed, open and hinge positions.');
+import * as THREE from 'three';
+import {TourInteractions} from '../lib/quest-interactions.ts';
+const scene=new THREE.Scene(),model=new THREE.Group();scene.add(model);
+const interactions=new TourInteractions(scene,model,'',()=>{}),root=new THREE.Group();
+const leaf=new THREE.Mesh(new THREE.BoxGeometry(.82,2.05,.04),new THREE.MeshBasicMaterial());leaf.position.set(.41,1.025,0);root.add(leaf);interactions.root.add(root);
+const item={root,label:'Test door',width:.82,closed:0,open:Math.PI/2,target:0,kind:'door'};root.userData.item=item;interactions.items.push(item);scene.updateMatrixWorld(true);
+assert.equal(interactions.canTravel(.4,1,.4,-1),false,'Closed door blocks a full movement segment');
+const ray=new THREE.Raycaster(new THREE.Vector3(.4,1,1),new THREE.Vector3(0,0,-1));
+assert.equal(interactions.activate(ray,new THREE.Vector3(.4,1.65,1)),true);
+for(let i=0;i<120;i++)interactions.update(1/60,new THREE.Vector3(.4,1.65,1));
+assert.equal(interactions.openCount,1);assert.equal(interactions.canTravel(.4,1,.4,-1),true);
+ray.set(new THREE.Vector3(1.5,1,-.4),new THREE.Vector3(-1,0,0));
+assert.equal(interactions.activate(ray,new THREE.Vector3(1.5,1.65,-.4)),true);
+for(let i=0;i<120;i++)interactions.update(1/60,new THREE.Vector3(1.5,1.65,-.4));
+assert.equal(interactions.openCount,0);assert.equal(interactions.canTravel(.4,1,.4,-1),false);
+console.log('Ray activation, open/close animation, and movement collision passed.');
+
+// A sliding leaf clears its opening without swinging into terrace furniture.
+const sliderRoot=new THREE.Group();sliderRoot.position.set(3,0,-9);interactions.root.add(sliderRoot);
+const slider={root:sliderRoot,label:'Terrace',width:.86,closed:0,open:.86,target:0,kind:'slider',baseX:3};interactions.items.push(slider);
+assert.equal(interactions.canTravel(3.42,-8.5,3.42,-9.5),false);
+slider.target=.86;for(let i=0;i<120;i++)interactions.update(1/60,new THREE.Vector3(3.42,1.65,-8));
+assert.equal(interactions.canTravel(3.42,-8.5,3.42,-9.5),true);
+slider.target=0;for(let i=0;i<120;i++)interactions.update(1/60,new THREE.Vector3(3.42,1.65,-8));
+assert.equal(interactions.canTravel(3.42,-8.5,3.42,-9.5),false);
+console.log('Terrace sliding door clearance and closed collision passed.');

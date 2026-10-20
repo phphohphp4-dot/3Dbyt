@@ -1,0 +1,1 @@
+import fs from 'node:fs';import{canStand}from'../lib/quest-navigation.ts';const g=JSON.parse(fs.readFileSync('public/mikulovice/navigation.json'));for(const[name,x,y]of[['south',6.05,4.71],['entry',10.08,3.3],['eastentry',12.82,3.3]]){console.log(name);for(let j=8;j>=-8;j--){let s='';for(let i=-8;i<=8;i++)s+=canStand(g,x+i*.12,-(y+j*.12))?'.':'#';console.log(s);}}
