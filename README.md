@@ -1,6 +1,6 @@
 # Openstudio — 3D prohlídky z půdorysu
 
-Světlý web ve vizuálním stylu Openstudia běží na `http://127.0.0.1:3004/`. Tlačítka **Nahrát půdorys** otevírají navazující klientskou stránku `/#nahrat-pudorys` ve stejném vzhledu. Tvorba a úpravy modelů jsou nyní pouze v soukromém studiu.
+Světlý web v původním zeleném vzhledu s logem Openstudia běží na `http://127.0.0.1:3004/`. Tlačítka **Nahrát půdorys** otevírají navazující klientskou stránku `/#nahrat-pudorys` ve stejném vzhledu. Tvorba a úpravy modelů jsou nyní pouze v soukromém studiu.
 
 
 ## Rychlé spuštění
@@ -18,7 +18,7 @@ předchozí Next.js sestavení. Obsahuje hotovou ukázkovou GLB prohlídku.
 
 ## Propojení s Openstudiem
 
-Stejné logo, světlá tyrkysová paleta a navigace. Ve stávající aplikaci
+Logo Openstudio, původní světlá limetkově zelená paleta a rozložení. Ve stávající aplikaci
 Openstudio je nová stránka `/3d-prohlidky` pod její skutečnou hlavičkou,
 včetně původního ovládání účtu. Přenositelné změny a návod jsou v
 [integrations/openstudio](integrations/openstudio/README.md).

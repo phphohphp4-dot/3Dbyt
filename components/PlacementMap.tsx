@@ -15,7 +15,7 @@ export function PlacementMap({value,onChange,readOnly=false}:{value:HousePlaceme
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[]);
  useEffect(()=>{if(!ready||!map.current||!lib.current)return;const L=lib.current,m=map.current;if(!value){shape.current?.remove();shape.current=null;marker.current?.remove();marker.current=null;return;}
- if(!shape.current)shape.current=L.polygon(houseCorners(value),{color:'#149f88',weight:3,fillColor:'#4fd1b8',fillOpacity:.45,interactive:false}).addTo(m);else shape.current.setLatLngs(houseCorners(value));
+ if(!shape.current)shape.current=L.polygon(houseCorners(value),{color:'#4b702f',weight:3,fillColor:'#a9e943',fillOpacity:.45,interactive:false}).addTo(m);else shape.current.setLatLngs(houseCorners(value));
  if(!marker.current){marker.current=L.marker([value.lat,value.lng],{draggable:!readOnly,title:readOnly?'Střed domu':'Přetáhněte střed domu',icon:L.divIcon({html:'<span aria-hidden="true">✥</span>',className:'intake-house-handle',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(m);marker.current.on('drag',()=>{const q=marker.current!.getLatLng();callback.current({...latest.current!,lat:q.lat,lng:q.lng});});}else marker.current.setLatLng([value.lat,value.lng]);
  },[value,ready,readOnly]);
  const search=async(e:React.FormEvent)=>{e.preventDefault();setSearching(true);setError('');setResults([]);try{const r=await fetch('/api/intake/search?q='+encodeURIComponent(query));const data=await r.json();if(!r.ok)throw new Error(data.error);setResults(data.results);if(!data.results.length)setError('Místo nenalezeno. Zkuste obec a ulici, nebo najděte místo přímo na mapě.');}catch(e){setError((e as Error).message);}finally{setSearching(false);}};
