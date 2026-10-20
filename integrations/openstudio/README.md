@@ -20,7 +20,21 @@ Lokálně spusťte tuto službu na portu 3004 (`npm run tour:build` a
 `npm run tour:serve`) a Openstudio na portu 8080. Otevřete
 `http://127.0.0.1:8080/3d-prohlidky`.
 
-## Nasazení
+## Shodná úvodní stránka
+
+`SpatialHero.tsx` a `spatial-home.css` patří společně do
+`src/components/home/` v Openstudiu. Komponenta používá stejné rozložení
+a CSS jako místní 3D aplikace; vlastní hlavičku nevykresluje, aby zůstala
+zachována navigace a účet Openstudia. Existující stránka `Index` ji vykresluje
+pod komponentou `Header`. Obrázky očekává v `/images/showcase/`.
+
+Při změně návrhu aktualizujte obě kopie. Nepřepisujte sekce znovu pomocí
+přibližných Tailwind tříd: mění to šířky, ořez fotografie i barvy panelů.
+Zdrojem rozložení je `components/ProjectExperience.tsx` a domovské styly
+v `styles/experience.css`. Odkazy v hostitelské komponentě vedou na
+`/3d-prohlidky`.
+
+## Nasazení služby
 
 Před sestavením Openstudia nastavte `VITE_3D_STUDIO_URL` na skutečnou
 HTTPS adresu nasazené 3D služby. Bez ní produkční stránka zobrazí kontakt
